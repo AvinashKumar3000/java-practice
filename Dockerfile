@@ -6,7 +6,8 @@ WORKDIR /app
 COPY . .
 
 # Build the app using system Maven
-RUN mvn clean package -DskipTests
+RUN mvn clean install
+RUN mvn clean package 
 
 # Run the app
 CMD ["sh", "-c", "java -jar target/*.jar"]
