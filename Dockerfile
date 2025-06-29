@@ -1,10 +1,21 @@
-# Use the Eclipse alpine official image
-# https://hub.docker.com/_/eclipse-temurin
+# Use lightweight JDK image
 FROM eclipse-temurin:21-jdk-alpine
 
-# Build the app.
-RUN ./mvnw clean install
-RUN ./mvnw clean package
+# Set working directory
+WORKDIR /app
 
-# Run the app by dynamically finding the JAR file in the target directory
+# Copy Maven wrapper scripts
+COPY .mvn/ .mvn
+COPY mvnw pom.xml ./
+
+# Pre-download dependencies to speed up builds
+RUN ./mvnw dependency:go-offline
+
+# Copy the rest of the source code
+COPY src ./src
+
+# Build the application
+RUN ./mvnw clean package -DskipTests
+
+# Run the application
 CMD ["sh", "-c", "java -jar target/*.jar"]
