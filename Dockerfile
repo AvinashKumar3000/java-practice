@@ -1,21 +1,12 @@
-# Use lightweight JDK image
 FROM eclipse-temurin:21-jdk-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Copy Maven wrapper scripts
-COPY .mvn/ .mvn
-COPY mvnw pom.xml ./
+# Copy the full project
+COPY . .
 
-# Pre-download dependencies to speed up builds
-RUN ./mvnw dependency:go-offline
+# Build the app using system Maven
+RUN mvn clean package -DskipTests
 
-# Copy the rest of the source code
-COPY src ./src
-
-# Build the application
-RUN ./mvnw clean package -DskipTests
-
-# Run the application
+# Run the app
 CMD ["sh", "-c", "java -jar target/*.jar"]
